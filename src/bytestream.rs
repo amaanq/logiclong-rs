@@ -22,11 +22,10 @@ impl ByteStream {
 
     // meant for writing
     pub fn new() -> ByteStream {
-        let mut buffer = Vec::new();
         ByteStream {
             length: 0,
             offset: 0,
-            cursor: Cursor::new(buffer),
+            cursor: Cursor::new(Vec::new()),
         }
     }
 }

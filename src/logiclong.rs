@@ -1,7 +1,7 @@
 #[derive(Debug)]
 pub struct LogicLong {
-    low: i32,
-    high: i32,
+    pub low: i32,
+    pub high: i32,
 }
 
 #[derive(Debug)]
@@ -49,7 +49,8 @@ impl LogicLong {
         ];
         let mut tag = String::new();
         let mut total = self.low + self.high * 0x100;
-        let mut b14 = 0;
+        let mut b14;
+
         while total != 0 {
             b14 = total % 14;
             total /= 14;
@@ -58,31 +59,31 @@ impl LogicLong {
         tag
     }
 
-    fn digit_to_char(digit: i32) -> String {
-        if digit < 10 {
-            return format!("{}", digit);
-        }
-        return format!("{}", (b'a' + digit as u8 - 10) as char);
-    }
+    // fn digit_to_char(digit: i32) -> String {
+    //     if digit < 10 {
+    //         return format!("{}", digit);
+    //     }
+    //     return format!("{}", (b'a' + digit as u8 - 10) as char);
+    // }
 
-    fn str_base(number: i32, base: i32) -> String {
-        if number < 0 {
-            return format!("-{}", LogicLong::str_base(-number, base));
-        }
-        let (d, m) = (number / base, number % base);
-        if d > 0 {
-            LogicLong::str_base(d, base) + &LogicLong::digit_to_char(m)
-        } else {
-            LogicLong::digit_to_char(m)
-        }
-    }
+    // fn str_base(number: i32, base: i32) -> String {
+    //     if number < 0 {
+    //         return format!("-{}", LogicLong::str_base(-number, base));
+    //     }
+    //     let (d, m) = (number / base, number % base);
+    //     if d > 0 {
+    //         LogicLong::str_base(d, base) + &LogicLong::digit_to_char(m)
+    //     } else {
+    //         LogicLong::digit_to_char(m)
+    //     }
+    // }
 
-    fn dec2rdx(mut num: i32) -> String {
-        let mut rv = String::new();
-        for _ in 0..4 {
-            rv = format!("{},", num & 0xFF) + &rv;
-            num >>= 8;
-        }
-        rv
-    }
+    // fn dec2rdx(mut num: i32) -> String {
+    //     let mut rv = String::new();
+    //     for _ in 0..4 {
+    //         rv = format!("{},", num & 0xFF) + &rv;
+    //         num >>= 8;
+    //     }
+    //     rv
+    // }
 }

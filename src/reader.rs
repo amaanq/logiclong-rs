@@ -68,7 +68,7 @@ impl ByteStream {
     }
 
     // read int32LE will read 4 bytes and return the value of the bytes as an i32 in little endian
-    pub fn read_int32LE(&mut self) -> Result<i32, ByteStreamError> {
+    pub fn read_int32_le(&mut self) -> Result<i32, ByteStreamError> {
         let int32 = self.cursor.read_i32::<LittleEndian>()?;
         Ok(int32)
     }
@@ -174,7 +174,7 @@ impl ByteStream {
     // reads the compressed string, and then decompresses it
     pub fn read_compressed_string(&mut self) -> Result<String, ByteStreamError> {
         let compressed_size = self.read_int32()?;
-        let _uncompressed_size = self.read_int32LE()?;
+        let _uncompressed_size = self.read_int32_le()?;
         let compressed_bytes = self.read_bytes(compressed_size as usize)?;
 
         let mut decompressor = ZlibDecoder::new(&compressed_bytes[..]);
