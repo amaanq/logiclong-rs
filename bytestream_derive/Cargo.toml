@@ -2,6 +2,9 @@
 name = "bytestream_derive"
 version = "0.1.0"
 edition = "2021"
+authors = ["amaanq"]
+description = "Codegen for bytestream-rs"
+license = "MIT"
 
 [lib]
 proc-macro = true
