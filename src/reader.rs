@@ -173,7 +173,7 @@ impl ByteStream {
     // read string will read a 4 byte i32 (n) declaring the length of the string, and then read n bytes from the buffer as a string
     pub fn read_string(&mut self) -> Result<String, ByteStreamError> {
         // read int32, then read that many bytes as a string
-        let length = self.read_int32()?;
+        let length = self.cursor.read_i32::<BigEndian>()?;
         if length < -1 {
             return Err(ByteStreamError::InvalidStringLength(length as usize));
         } else if length == 0 || length == -1 {
@@ -189,7 +189,7 @@ impl ByteStream {
     // read string_reference = read string
     pub fn read_string_reference(&mut self) -> Result<String, ByteStreamError> {
         // read int32, then read that many bytes, same for reading but different when writing
-        let length = self.read_int32()?;
+        let length = self.cursor.read_i32::<BigEndian>()?;
         if length < -1 {
             return Err(ByteStreamError::InvalidStringLength(length as usize));
         } else if length == 0 || length == -1 {
