@@ -181,7 +181,10 @@ impl ByteStream {
             return Ok(String::new());
         }
 
-        let str = self.read_string_size(length as usize)?;
+        let mut bytes = vec![0; length as usize];
+        self.cursor.read_exact(&mut bytes)?;
+        let str =
+            String::from_utf8(bytes).map_err(|e| ByteStreamError::InvalidString(e.to_string()))?;
         self.message += format!("(String): {}\n", str).as_str();
         Ok(str)
     }
@@ -197,7 +200,10 @@ impl ByteStream {
             return Ok(String::new());
         }
 
-        let str = self.read_string_size(length as usize)?;
+        let mut bytes = vec![0; length as usize];
+        self.cursor.read_exact(&mut bytes)?;
+        let str =
+            String::from_utf8(bytes).map_err(|e| ByteStreamError::InvalidString(e.to_string()))?;
         self.message += format!("(StringReference): {}\n", str).as_str();
         Ok(str)
     }
@@ -209,6 +215,7 @@ impl ByteStream {
         self.cursor.read_exact(&mut bytes)?;
         let str =
             String::from_utf8(bytes).map_err(|e| ByteStreamError::InvalidString(e.to_string()))?;
+        self.message += format!("(StringSize): {}\n", str).as_str();
         Ok(str)
     }
 
