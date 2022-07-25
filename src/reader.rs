@@ -9,7 +9,6 @@ impl ByteStream {
     // read a byte from the buffer
     pub fn read_byte(&mut self) -> Result<u8, ByteStreamError> {
         let byte = self.cursor.read_u8()?;
-        self.message += format!("(Byte): {}\n", byte).as_str();
         Ok(byte)
     }
 
@@ -190,7 +189,15 @@ impl ByteStream {
     // read string_reference = read string
     pub fn read_string_reference(&mut self) -> Result<String, ByteStreamError> {
         // read int32, then read that many bytes, same for reading but different when writing
-        let str = self.read_string()?;
+        let length = self.read_int32()?;
+        if length < -1 {
+            return Err(ByteStreamError::InvalidStringLength(length as usize));
+        } else if length == 0 || length == -1 {
+            self.message += "(StringReference): \n";
+            return Ok(String::new());
+        }
+
+        let str = self.read_string_size(length as usize)?;
         self.message += format!("(StringReference): {}\n", str).as_str();
         Ok(str)
     }
@@ -208,8 +215,8 @@ impl ByteStream {
     // read compressed_string reads a 4 byte compressed length, 4 byte LE uncompressed length,
     // reads the compressed string, and then decompresses it
     pub fn read_compressed_string(&mut self) -> Result<String, ByteStreamError> {
-        let compressed_size = self.read_int32()?;
-        let _uncompressed_size = self.read_int32_le()?;
+        let compressed_size = self.cursor.read_i32::<BigEndian>()?;
+        let _uncompressed_size = self.cursor.read_i32::<LittleEndian>()?;
         let compressed_bytes = self.read_bytes(compressed_size as usize)?;
 
         let mut decompressor = ZlibDecoder::new(&compressed_bytes[..]);
@@ -221,7 +228,10 @@ impl ByteStream {
 
     // custom 2 4 byte ints that represent a game player tag, see logiclong.rs for more info
     pub fn read_logic_long(&mut self) -> Result<LogicLong, ByteStreamError> {
-        let (low, high) = (self.read_int32()?, self.read_int32()?);
+        let (low, high) = (
+            self.cursor.read_i32::<BigEndian>()?,
+            self.cursor.read_i32::<BigEndian>()?,
+        );
         let logic_long = LogicLong::new(low, high);
         self.message += format!("(LogicLong): {}\n", logic_long).as_str();
         Ok(LogicLong::new(low, high))
