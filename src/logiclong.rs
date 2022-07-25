@@ -50,7 +50,7 @@ impl LogicLong {
             '0', '2', '8', '9', 'P', 'Y', 'L', 'Q', 'G', 'R', 'J', 'C', 'U', 'V',
         ];
         let mut tag = String::new();
-        let mut total = self.low + self.high * 0x100;
+        let mut total = self.low as i64 + self.high as i64 * 0x100;
         let mut b14;
 
         while total != 0 {
