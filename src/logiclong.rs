@@ -1,3 +1,5 @@
+use std::fmt;
+
 #[derive(Debug)]
 pub struct LogicLong {
     pub low: i32,
@@ -86,4 +88,10 @@ impl LogicLong {
     //     }
     //     rv
     // }
+}
+
+impl fmt::Display for LogicLong {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{} ({}, {})", self.to_tag(), self.low, self.high)
+    }
 }

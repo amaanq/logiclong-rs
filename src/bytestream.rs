@@ -6,6 +6,7 @@ pub struct ByteStream {
     pub cursor: Cursor<Vec<u8>>,
     pub offset: usize,
     pub length: usize,
+    pub message: String,
     // reader: std::io::BufReader,
     // writer: std::io::BufWriter,
 }
@@ -17,6 +18,7 @@ impl ByteStream {
             length: buffer.len(),
             offset: 0,
             cursor: Cursor::new(buffer),
+            message: String::new(),
         }
     }
 
@@ -26,6 +28,7 @@ impl ByteStream {
             length: 0,
             offset: 0,
             cursor: Cursor::new(Vec::new()),
+            message: String::new(),
         }
     }
 }
