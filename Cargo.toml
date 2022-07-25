@@ -1,6 +1,6 @@
 [package]
 name = "bytestream-rs"
-version = "0.2.6"
+version = "0.3.0"
 edition = "2021"
 authors = ["amaanq"]
 description = "Supercell ByteStream implementation in Rust"
