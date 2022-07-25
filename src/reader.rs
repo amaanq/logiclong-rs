@@ -216,10 +216,15 @@ impl ByteStream {
     // reads the compressed string, and then decompresses it
     pub fn read_compressed_string(&mut self) -> Result<String, ByteStreamError> {
         let compressed_size = self.cursor.read_i32::<BigEndian>()?;
-        let _uncompressed_size = self.cursor.read_i32::<LittleEndian>()?;
+        // let _uncompressed_size = self.cursor.read_i32::<LittleEndian>()?;
         let compressed_bytes = self.read_bytes(compressed_size as usize)?;
 
-        let mut decompressor = ZlibDecoder::new(&compressed_bytes[..]);
+        let _uncompressed_size = i32::from_be_bytes(
+            compressed_bytes[0..4]
+                .try_into()
+                .map_err(|_| ByteStreamError::NotEnoughBytes)?,
+        );
+        let mut decompressor = ZlibDecoder::new(&compressed_bytes[4..]);
         let mut data = String::new();
         decompressor.read_to_string(&mut data)?;
         self.message += format!("(CompressedString): {}\n", data).as_str();
