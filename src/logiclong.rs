@@ -1,13 +1,12 @@
 use std::fmt;
 
-#[derive(Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct LogicLong {
     pub low: i32,
     pub high: i32,
 }
 
-#[derive(Debug)]
-
+#[derive(Clone, Debug, PartialEq)]
 pub enum LogicLongError {
     InvalidTag(String),
 }

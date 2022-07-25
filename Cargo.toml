@@ -11,3 +11,4 @@ license = "MIT"
 [dependencies]
 flate2 = "1.0.24"
 byteorder = "1.4.3"
+bytestream_derive = "0.1.0"
