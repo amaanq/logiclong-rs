@@ -202,7 +202,6 @@ impl ByteStream {
         self.cursor.read_exact(&mut bytes)?;
         let str =
             String::from_utf8(bytes).map_err(|e| ByteStreamError::InvalidString(e.to_string()))?;
-        self.message += format!("(StringSize): {}\n", str).as_str();
         Ok(str)
     }
 
@@ -223,7 +222,7 @@ impl ByteStream {
     // custom 2 4 byte ints that represent a game player tag, see logiclong.rs for more info
     pub fn read_logic_long(&mut self) -> Result<LogicLong, ByteStreamError> {
         let (low, high) = (self.read_int32()?, self.read_int32()?);
-        let logic_long = LogicLong { low, high };
+        let logic_long = LogicLong::new(low, high);
         self.message += format!("(LogicLong): {}\n", logic_long).as_str();
         Ok(LogicLong::new(low, high))
     }
