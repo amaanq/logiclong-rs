@@ -9,18 +9,6 @@ use syn::{
 
 mod message;
 
-#[derive(Debug)]
-struct Message {
-    name: String,
-    fields: Vec<EntityField>,
-}
-
-#[derive(Debug)]
-struct EntityField {
-    name: String,
-    login_token: String,
-}
-
 /// Generate `rakrs_io::CanIo` implementation for structs and enums that have all fields implement `CanIo`
 ///
 /// For structs, fields are written one by one in order.

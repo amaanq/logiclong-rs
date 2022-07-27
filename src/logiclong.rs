@@ -4,6 +4,7 @@ use std::fmt;
 pub struct LogicLong {
     pub low: i32,
     pub high: i32,
+    pub tag: String,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -13,7 +14,13 @@ pub enum LogicLongError {
 
 impl LogicLong {
     pub fn new(low: i32, high: i32) -> LogicLong {
-        LogicLong { low, high }
+        let mut logic_long = LogicLong {
+            low,
+            high,
+            tag: String::new(),
+        };
+        logic_long.tag = logic_long.to_tag();
+        logic_long
     }
 
     pub fn new_from_tag(tag: String) -> Result<LogicLong, LogicLongError> {
@@ -41,6 +48,7 @@ impl LogicLong {
         Ok(LogicLong {
             low: (total as i32 % 256),
             high: (total as i32 / 256),
+            tag,
         })
     }
 
