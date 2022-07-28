@@ -1,6 +1,6 @@
 use std::fmt;
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct LogicLong {
     pub low: i32,
     pub high: i32,
