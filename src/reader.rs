@@ -241,8 +241,8 @@ impl ByteStream {
     // custom 2 4 byte ints that represent a game player tag, see logiclong.rs for more info
     pub fn read_logic_long(&mut self) -> Result<LogicLong, ByteStreamError> {
         let (low, high) = (
-            self.cursor.read_i32::<BigEndian>()?,
-            self.cursor.read_i32::<BigEndian>()?,
+            self.cursor.read_u32::<BigEndian>()?,
+            self.cursor.read_u32::<BigEndian>()?,
         );
         let logic_long = LogicLong::new(low, high);
         self.message += format!("(LogicLong): {}\n", logic_long).as_str();

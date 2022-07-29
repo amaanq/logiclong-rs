@@ -188,8 +188,8 @@ impl ByteStream {
     }
 
     pub fn write_logic_long(&mut self, logic_long: LogicLong) -> Result<(), ByteStreamError> {
-        self.cursor.write_i32::<BigEndian>(logic_long.low)?;
-        self.cursor.write_i32::<BigEndian>(logic_long.high)?;
+        self.cursor.write_u32::<BigEndian>(logic_long.low)?;
+        self.cursor.write_u32::<BigEndian>(logic_long.high)?;
         Ok(())
     }
 }

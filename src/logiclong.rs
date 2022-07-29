@@ -2,8 +2,8 @@ use std::fmt;
 
 #[derive(Clone, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct LogicLong {
-    pub low: i32,
-    pub high: i32,
+    pub low: u32,
+    pub high: u32,
     pub tag: String,
 }
 
@@ -13,7 +13,7 @@ pub enum LogicLongError {
 }
 
 impl LogicLong {
-    pub fn new(low: i32, high: i32) -> LogicLong {
+    pub fn new(low: u32, high: u32) -> LogicLong {
         let mut logic_long = LogicLong {
             low,
             high,
@@ -32,8 +32,8 @@ impl LogicLong {
             '0', '2', '8', '9', 'P', 'Y', 'L', 'Q', 'G', 'R', 'J', 'C', 'U', 'V',
         ];
         let tag = tag.replace("#", "").replace(" ", "");
-        let mut total: i64 = 0;
-        let base: i64 = 14;
+        let mut total: u64 = 0;
+        let base: u64 = 14;
 
         // iterate backwards
         for (i, c) in tag.chars().rev().enumerate() {
@@ -43,11 +43,11 @@ impl LogicLong {
                 .position(|&x| x == c)
                 .ok_or_else(|| LogicLongError::InvalidTag(tag.clone()))?;
             // total += index times 14 to the power of i
-            total += index as i64 * base.pow(i as u32);
+            total += index as u64 * base.pow(i as u32);
         }
         Ok(LogicLong {
-            low: (total as i32 % 256),
-            high: (total as i32 / 256),
+            low: (total as u32 % 256),
+            high: (total as u32 / 256),
             tag,
         })
     }
