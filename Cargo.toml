@@ -1,6 +1,6 @@
 [package]
 name = "bytestream-rs"
-version = "0.3.4"
+version = "0.3.5"
 edition = "2021"
 authors = ["amaanq"]
 description = "Supercell ByteStream implementation in Rust"
@@ -9,6 +9,7 @@ license = "MIT"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+rand = "0.8.5"
 flate2 = "1.0.24"
 byteorder = "1.4.3"
 bytestream_derive = "0.1.0"

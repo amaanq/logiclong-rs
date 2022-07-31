@@ -1,3 +1,4 @@
+use rand::{self, Rng};
 use std::fmt;
 
 #[derive(Clone, Default, PartialEq, Eq, PartialOrd, Ord)]
@@ -50,6 +51,13 @@ impl LogicLong {
             high: (total as u32 / 256),
             tag,
         })
+    }
+
+    pub fn random() -> LogicLong {
+        let mut rng = rand::thread_rng();
+        let low = rng.gen_range(0..100);
+        let high = rng.gen::<u32>();
+        LogicLong::new(low, high)
     }
 
     pub fn to_tag(&self) -> String {
