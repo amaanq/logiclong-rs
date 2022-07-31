@@ -1,9 +1,9 @@
 pub mod bytestream;
 pub mod logiclong;
+pub mod logiclong_test;
 pub mod reader;
 pub mod writer;
 
-use bytestream_derive::Describe;
 
 // #[derive(Describe)]
 // struct LoginMessage {

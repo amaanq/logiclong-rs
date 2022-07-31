@@ -1,7 +1,7 @@
 use rand::{self, Rng};
 use std::fmt;
 
-#[derive(Clone, Default, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Default, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct LogicLong {
     pub low: u32,
     pub high: u32,
@@ -45,10 +45,11 @@ impl LogicLong {
                 .ok_or_else(|| LogicLongError::InvalidTag(tag.clone()))?;
             // total += index times 14 to the power of i
             total += index as u64 * base.pow(i as u32);
+            println!("TOTAL {}", total);
         }
         Ok(LogicLong {
-            low: (total as u32 % 256),
-            high: (total as u32 / 256),
+            low: ((total % 256) as u32),
+            high: ((total / 256) as u32),
             tag,
         })
     }
