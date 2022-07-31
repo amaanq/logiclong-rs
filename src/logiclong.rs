@@ -31,7 +31,7 @@ impl LogicLong {
         let arr: Vec<char> = vec![
             '0', '2', '8', '9', 'P', 'Y', 'L', 'Q', 'G', 'R', 'J', 'C', 'U', 'V',
         ];
-        let tag = tag.replace("#", "").replace(" ", "");
+        let tag = tag.replace("#", "").replace(" ", "").to_uppercase();
         let mut total: u64 = 0;
         let base: u64 = 14;
 
