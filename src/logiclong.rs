@@ -45,7 +45,6 @@ impl LogicLong {
                 .ok_or_else(|| LogicLongError::InvalidTag(tag.clone()))?;
             // total += index times 14 to the power of i
             total += index as u64 * base.pow(i as u32);
-            println!("TOTAL {}", total);
         }
         Ok(LogicLong {
             low: ((total % 256) as u32),

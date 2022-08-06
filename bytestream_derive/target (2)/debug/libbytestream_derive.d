@@ -1,1 +1,0 @@
-/home/amaanq/projects/bytestream-rs/bytestream_derive/target/debug/libbytestream_derive.so: /home/amaanq/projects/bytestream-rs/bytestream_derive/src/lib.rs /home/amaanq/projects/bytestream-rs/bytestream_derive/src/message.rs
