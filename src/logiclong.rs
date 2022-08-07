@@ -1,4 +1,5 @@
 use rand::{self, Rng};
+use regex::Regex;
 use std::fmt;
 
 #[derive(Clone, Default, Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -32,7 +33,7 @@ impl LogicLong {
         let arr: Vec<char> = vec![
             '0', '2', '8', '9', 'P', 'Y', 'L', 'Q', 'G', 'R', 'J', 'C', 'U', 'V',
         ];
-        let tag = tag.replace("#", "").replace(" ", "").to_uppercase();
+        let tag = LogicLong::fix_tag(tag);
         let mut total: u64 = 0;
         let base: u64 = 14;
 
@@ -51,6 +52,14 @@ impl LogicLong {
             high: ((total / 256) as u32),
             tag,
         })
+    }
+
+    pub fn fix_tag(tag: String) -> String {
+        let re = Regex::new("[^A-Z0-9]+").unwrap();
+        "#".to_owned()
+            + &re
+                .replace_all(tag.to_uppercase().as_str(), "")
+                .replace("O", "0")
     }
 
     pub fn random() -> LogicLong {

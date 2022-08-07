@@ -1,6 +1,6 @@
 [package]
 name = "bytestream-rs"
-version = "0.3.8"
+version = "0.4.0"
 edition = "2021"
 authors = ["amaanq"]
 description = "Supercell ByteStream implementation in Rust"
@@ -13,3 +13,4 @@ rand = "0.8.5"
 flate2 = "1.0.24"
 byteorder = "1.4.3"
 bytestream_derive = "0.1.0"
+regex = "1"
