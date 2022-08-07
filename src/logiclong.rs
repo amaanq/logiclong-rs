@@ -38,7 +38,7 @@ impl LogicLong {
         let base: u64 = 14;
 
         // iterate backwards
-        for (i, c) in tag.chars().rev().enumerate() {
+        for (i, c) in tag.replace("#", "").chars().rev().enumerate() {
             // get index of c in arr
             let index = arr
                 .iter()
@@ -82,7 +82,7 @@ impl LogicLong {
             total /= 14;
             tag.insert(0, arr[b14 as usize]);
         }
-        tag
+        LogicLong::fix_tag(tag)
     }
 
     // fn digit_to_char(digit: i32) -> String {
