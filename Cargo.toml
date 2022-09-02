@@ -5,6 +5,8 @@ edition = "2021"
 authors = ["amaanq"]
 description = "Supercell's Logic Long implemented in Rust"
 license = "MIT"
+homepage = "https://github.com/amaanq/logiclong-rs"
+repository = "https://github.com/amaanq/logiclong-rs"
 
 [dependencies]
 rand = "0.8.5"
