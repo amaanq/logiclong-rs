@@ -6,7 +6,7 @@ mod tests {
 
     #[test]
     fn test_logic_long() {
-        let logic_long = LogicLong::new_from_tag("#QL82UUGGG".to_string());
+        let logic_long = LogicLong::from_tag("80CY2LC2R".to_string());
         println!("{:#?}", logic_long);
     }
 }

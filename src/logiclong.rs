@@ -1,6 +1,6 @@
 use rand::{self, Rng};
 use regex::Regex;
-use std::fmt;
+use std::{fmt, str::FromStr};
 
 #[derive(Clone, Default, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct LogicLong {
@@ -9,12 +9,18 @@ pub struct LogicLong {
     pub tag: String,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum LogicLongError {
     InvalidTag(String),
+    InvalidLowID(String),
 }
 
 impl LogicLong {
+    pub const ORDER: [char; 14] = [
+        '0', '2', '8', '9', 'P', 'Y', 'L', 'Q', 'G', 'R', 'J', 'C', 'U', 'V',
+    ];
+    pub(crate) const BASE: u64 = 14;
+
     pub fn new(low: u32, high: u32) -> LogicLong {
         let mut logic_long = LogicLong {
             low,
@@ -25,41 +31,47 @@ impl LogicLong {
         logic_long
     }
 
-    pub fn new_from_tag(tag: String) -> Result<LogicLong, LogicLongError> {
-        return LogicLong::from_tag(tag);
+    pub fn from_tag(tag: String) -> Result<LogicLong, LogicLongError> {
+        LogicLong::parse_tag(tag)
     }
 
-    pub fn from_tag(tag: String) -> Result<LogicLong, LogicLongError> {
-        let arr: Vec<char> = vec![
-            '0', '2', '8', '9', 'P', 'Y', 'L', 'Q', 'G', 'R', 'J', 'C', 'U', 'V',
-        ];
+    pub(crate) fn parse_tag(tag: String) -> Result<LogicLong, LogicLongError> {
         let tag = LogicLong::fix_tag(tag);
         let mut total: u64 = 0;
-        let base: u64 = 14;
 
         // iterate backwards
-        for (i, c) in tag.replace("#", "").chars().rev().enumerate() {
+        for (_index, char) in tag.replace('#', "").chars().rev().enumerate() {
             // get index of c in arr
-            let index = arr
+            let index = LogicLong::ORDER
                 .iter()
-                .position(|&x| x == c)
+                .position(|&x| x == char)
                 .ok_or_else(|| LogicLongError::InvalidTag(tag.clone()))?;
             // total += index times 14 to the power of i
-            total += index as u64 * base.pow(i as u32);
+            total += index as u64 * Self::BASE.pow(index as u32);
         }
-        Ok(LogicLong {
-            low: ((total % 256) as u32),
-            high: ((total / 256) as u32),
-            tag,
-        })
+
+        let (low, high) = (((total % 256) as u32), ((total / 256) as u32));
+
+        if low > 100 {
+            return Err(LogicLongError::InvalidLowID(tag));
+        }
+
+        Ok(LogicLong { low, high, tag })
     }
 
+    /// Returns a "proper" tag, i.e. starts with # always and is purely uppercase with no 0s or Os
     pub fn fix_tag(tag: String) -> String {
         let re = Regex::new("[^A-Z0-9]+").unwrap();
         "#".to_owned()
             + &re
                 .replace_all(tag.to_uppercase().as_str(), "")
-                .replace("O", "0")
+                .replace('O', "0")
+    }
+
+    pub fn is_valid_tag(&self, tag: String) -> bool {
+        Regex::new("^#[oO0289PYLQGRJCUVpylqgrjcuv]+$")
+            .unwrap()
+            .is_match(&tag)
     }
 
     pub fn random() -> LogicLong {
@@ -84,38 +96,23 @@ impl LogicLong {
         }
         LogicLong::fix_tag(tag)
     }
-
-    // fn digit_to_char(digit: i32) -> String {
-    //     if digit < 10 {
-    //         return format!("{}", digit);
-    //     }
-    //     return format!("{}", (b'a' + digit as u8 - 10) as char);
-    // }
-
-    // fn str_base(number: i32, base: i32) -> String {
-    //     if number < 0 {
-    //         return format!("-{}", LogicLong::str_base(-number, base));
-    //     }
-    //     let (d, m) = (number / base, number % base);
-    //     if d > 0 {
-    //         LogicLong::str_base(d, base) + &LogicLong::digit_to_char(m)
-    //     } else {
-    //         LogicLong::digit_to_char(m)
-    //     }
-    // }
-
-    // fn dec2rdx(mut num: i32) -> String {
-    //     let mut rv = String::new();
-    //     for _ in 0..4 {
-    //         rv = format!("{},", num & 0xFF) + &rv;
-    //         num >>= 8;
-    //     }
-    //     rv
-    // }
 }
 
 impl fmt::Display for LogicLong {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{} ({}, {})", self.to_tag(), self.low, self.high)
+    }
+}
+
+impl FromStr for LogicLong {
+    type Err = LogicLongError;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        LogicLong::parse_tag(s.to_string())
+    }
+}
+
+impl From<LogicLong> for String {
+    fn from(logic_long: LogicLong) -> String {
+        logic_long.tag
     }
 }

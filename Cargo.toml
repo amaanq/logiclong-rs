@@ -1,16 +1,11 @@
 [package]
-name = "bytestream-rs"
-version = "0.4.1"
+name = "logiclong"
+version = "0.1.0"
 edition = "2021"
 authors = ["amaanq"]
-description = "Supercell ByteStream implementation in Rust"
+description = "Supercell's Logic Long implemented in Rust"
 license = "MIT"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 rand = "0.8.5"
-flate2 = "1.0.24"
-byteorder = "1.4.3"
-bytestream_derive = "0.1.0"
 regex = "1"
