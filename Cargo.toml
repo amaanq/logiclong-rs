@@ -1,6 +1,6 @@
 [package]
 name = "logic-long"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 authors = ["amaanq"]
 description = "Supercell's Logic Long implemented in Rust"
@@ -9,5 +9,6 @@ homepage = "https://github.com/amaanq/logiclong-rs"
 repository = "https://github.com/amaanq/logiclong-rs"
 
 [dependencies]
+lazy_static = "1.4.0"
 rand = "0.8.5"
 regex = "1"

@@ -1,3 +1,4 @@
+use lazy_static::lazy_static;
 use rand::{self, Rng};
 use regex::Regex;
 use std::{fmt, str::FromStr};
@@ -13,6 +14,11 @@ pub struct LogicLong {
 pub enum LogicLongError {
     InvalidTag(String),
     InvalidLowID(String),
+}
+
+lazy_static! {
+    pub static ref VALID_REGEX: Regex = Regex::new("^#[oO0289PYLQGRJCUVpylqgrjcuv]+$").unwrap();
+    pub static ref FIX_REGEX: Regex = Regex::new("[^A-Z0-9]+").unwrap();
 }
 
 impl LogicLong {
@@ -60,18 +66,15 @@ impl LogicLong {
     }
 
     /// Returns a "proper" tag, i.e. starts with # always and is purely uppercase with no 0s or Os
-    pub fn fix_tag(tag: String) -> String {
-        let re = Regex::new("[^A-Z0-9]+").unwrap();
-        "#".to_owned()
-            + &re
-                .replace_all(tag.to_uppercase().as_str(), "")
-                .replace('O', "0")
+    pub fn is_valid_tag(tag: String) -> bool {
+        VALID_REGEX.is_match(&tag.to_uppercase().replace('O', "0"))
     }
 
-    pub fn is_valid_tag(&self, tag: String) -> bool {
-        Regex::new("^#[oO0289PYLQGRJCUVpylqgrjcuv]+$")
-            .unwrap()
-            .is_match(&tag)
+    pub fn fix_tag(tag: String) -> String {
+        "#".to_owned()
+            + &FIX_REGEX
+                .replace_all(&tag.to_uppercase(), "")
+                .replace('O', "0")
     }
 
     pub fn random() -> LogicLong {
