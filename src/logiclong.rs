@@ -41,7 +41,7 @@ impl LogicLong {
 
         // iterate backwards
         for (_index, char) in tag.replace('#', "").chars().rev().enumerate() {
-            // get index of c in arr
+            // get index of char in arr
             let index = LogicLong::ORDER
                 .iter()
                 .position(|&x| x == char)

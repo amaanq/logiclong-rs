@@ -1,5 +1,5 @@
 [package]
-name = "logiclong"
+name = "logic-long"
 version = "0.1.0"
 edition = "2021"
 authors = ["amaanq"]
