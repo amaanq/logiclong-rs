@@ -50,18 +50,17 @@ impl LogicLong {
         let mut total: u64 = 0;
 
         // iterate backwards
-        for (_index, char) in tag.replace('#', "").chars().rev().enumerate() {
-            // get index of char in arr
-            let index = LogicLong::ORDER
+        for (index, char) in tag.replace('#', "").chars().rev().enumerate() {
+            // get position of char in arr
+            let position = LogicLong::ORDER
                 .iter()
                 .position(|&x| x == char)
                 .ok_or_else(|| LogicLongError::InvalidTag(tag.clone()))?;
-            // total += index times 14 to the power of i
-            total += index as u64 * Self::BASE.pow(index as u32);
+            // total += position times 14 to the power of index
+            total += position as u64 * Self::BASE.pow(index as u32);
         }
 
         let (low, high) = (((total % 256) as u32), ((total / 256) as u32));
-
         if low > 100 {
             Err(LogicLongError::InvalidTag(tag))
         } else {
@@ -128,6 +127,12 @@ impl From<LogicLong> for String {
 impl From<String> for LogicLong {
     fn from(tag: String) -> LogicLong {
         LogicLong::parse_tag(tag).unwrap_or_default()
+    }
+}
+
+impl From<&str> for LogicLong {
+    fn from(tag: &str) -> LogicLong {
+        LogicLong::parse_tag(tag.to_owned()).unwrap_or_default()
     }
 }
 
