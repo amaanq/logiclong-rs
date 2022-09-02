@@ -13,7 +13,7 @@ pub struct LogicLong {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum LogicLongError {
     InvalidTag(String),
-    InvalidLowID(String),
+    InvalidLowID(u32),
 }
 
 lazy_static! {
@@ -27,14 +27,18 @@ impl LogicLong {
     ];
     pub(crate) const BASE: u64 = 14;
 
-    pub fn new(low: u32, high: u32) -> LogicLong {
+    pub fn new(low: u32, high: u32) -> Result<LogicLong, LogicLongError> {
+        if low > 100 {
+            return Err(LogicLongError::InvalidLowID(low));
+        }
+
         let mut logic_long = LogicLong {
             low,
             high,
             tag: String::new(),
         };
         logic_long.tag = logic_long.to_tag();
-        logic_long
+        Ok(logic_long)
     }
 
     pub fn from_tag(tag: String) -> Result<LogicLong, LogicLongError> {
@@ -59,10 +63,10 @@ impl LogicLong {
         let (low, high) = (((total % 256) as u32), ((total / 256) as u32));
 
         if low > 100 {
-            return Err(LogicLongError::InvalidLowID(tag));
+            Err(LogicLongError::InvalidTag(tag))
+        } else {
+            Ok(LogicLong { low, high, tag })
         }
-
-        Ok(LogicLong { low, high, tag })
     }
 
     /// Returns a "proper" tag, i.e. starts with # always and is purely uppercase with no 0s or Os
@@ -81,7 +85,8 @@ impl LogicLong {
         let mut rng = rand::thread_rng();
         let low = rng.gen_range(0..100);
         let high = rng.gen::<u32>();
-        LogicLong::new(low, high)
+        // unwrapping here because low is < 100
+        LogicLong::new(low, high).unwrap()
     }
 
     pub fn to_tag(&self) -> String {
@@ -119,3 +124,20 @@ impl From<LogicLong> for String {
         logic_long.tag
     }
 }
+
+impl From<String> for LogicLong {
+    fn from(tag: String) -> LogicLong {
+        LogicLong::parse_tag(tag).unwrap_or_default()
+    }
+}
+
+impl fmt::Display for LogicLongError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            LogicLongError::InvalidTag(tag) => write!(f, "{} is not a valid tag.", tag),
+            LogicLongError::InvalidLowID(low) => write!(f, "Invalid low ID: {}", low),
+        }
+    }
+}
+
+impl std::error::Error for LogicLongError {}
