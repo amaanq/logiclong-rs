@@ -3,7 +3,7 @@ use rand::{self, Rng};
 use regex::Regex;
 use std::{fmt, str::FromStr};
 
-#[derive(Clone, Default, Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct LogicLong {
     pub low: u32,
     pub high: u32,
@@ -107,7 +107,17 @@ impl LogicLong {
 
 impl fmt::Display for LogicLong {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{} ({}, {})", self.to_tag(), self.low, self.high)
+        write!(f, "{}", self.tag)
+    }
+}
+
+impl fmt::Debug for LogicLong {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "LogicLong {{ low: {}, high: {}, tag: {} }}",
+            self.low, self.high, self.tag
+        )
     }
 }
 
@@ -121,18 +131,6 @@ impl FromStr for LogicLong {
 impl From<LogicLong> for String {
     fn from(logic_long: LogicLong) -> String {
         logic_long.tag
-    }
-}
-
-impl From<String> for LogicLong {
-    fn from(tag: String) -> LogicLong {
-        LogicLong::parse_tag(tag).unwrap_or_default()
-    }
-}
-
-impl From<&str> for LogicLong {
-    fn from(tag: &str) -> LogicLong {
-        LogicLong::parse_tag(tag.to_owned()).unwrap_or_default()
     }
 }
 
