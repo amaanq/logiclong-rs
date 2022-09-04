@@ -1,7 +1,8 @@
+use std::{fmt, str::FromStr};
+
 use lazy_static::lazy_static;
 use rand::{self, Rng};
 use regex::Regex;
-use std::{fmt, str::FromStr};
 
 #[derive(Clone, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct LogicLong {
@@ -22,9 +23,8 @@ lazy_static! {
 }
 
 impl LogicLong {
-    pub const ORDER: [char; 14] = [
-        '0', '2', '8', '9', 'P', 'Y', 'L', 'Q', 'G', 'R', 'J', 'C', 'U', 'V',
-    ];
+    pub const ORDER: [char; 14] =
+        ['0', '2', '8', '9', 'P', 'Y', 'L', 'Q', 'G', 'R', 'J', 'C', 'U', 'V'];
     pub(crate) const BASE: u64 = 14;
 
     pub fn new(low: u32, high: u32) -> Result<LogicLong, LogicLongError> {
@@ -32,11 +32,7 @@ impl LogicLong {
             return Err(LogicLongError::InvalidLowID(low));
         }
 
-        let mut logic_long = LogicLong {
-            low,
-            high,
-            tag: String::new(),
-        };
+        let mut logic_long = LogicLong { low, high, tag: String::new() };
         logic_long.tag = logic_long.to_tag();
         Ok(logic_long)
     }
@@ -74,10 +70,7 @@ impl LogicLong {
     }
 
     pub fn fix_tag(tag: String) -> String {
-        "#".to_owned()
-            + &FIX_REGEX
-                .replace_all(&tag.to_uppercase(), "")
-                .replace('O', "0")
+        "#".to_owned() + &FIX_REGEX.replace_all(&tag.to_uppercase(), "").replace('O', "0")
     }
 
     pub fn random() -> LogicLong {
@@ -89,9 +82,8 @@ impl LogicLong {
     }
 
     pub fn to_tag(&self) -> String {
-        let arr: Vec<char> = vec![
-            '0', '2', '8', '9', 'P', 'Y', 'L', 'Q', 'G', 'R', 'J', 'C', 'U', 'V',
-        ];
+        let arr: Vec<char> =
+            vec!['0', '2', '8', '9', 'P', 'Y', 'L', 'Q', 'G', 'R', 'J', 'C', 'U', 'V'];
         let mut tag = String::new();
         let mut total = self.low as i64 + self.high as i64 * 0x100;
         let mut b14;
@@ -113,11 +105,7 @@ impl fmt::Display for LogicLong {
 
 impl fmt::Debug for LogicLong {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "LogicLong {{ low: {}, high: {}, tag: {} }}",
-            self.low, self.high, self.tag
-        )
+        write!(f, "LogicLong {{ low: {}, high: {}, tag: {} }}", self.low, self.high, self.tag)
     }
 }
 
