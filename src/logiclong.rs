@@ -6,15 +6,15 @@ use regex::Regex;
 
 #[derive(Clone, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct LogicLong {
-    pub low: u32,
     pub high: u32,
+    pub low: u32,
     pub tag: String,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum LogicLongError {
     InvalidTag(String),
-    InvalidLowID(u32),
+    InvalidHighID(u32),
 }
 
 lazy_static! {
@@ -27,12 +27,8 @@ impl LogicLong {
         ['0', '2', '8', '9', 'P', 'Y', 'L', 'Q', 'G', 'R', 'J', 'C', 'U', 'V'];
     pub(crate) const BASE: u64 = 14;
 
-    pub fn new(low: u32, high: u32) -> Result<LogicLong, LogicLongError> {
-        if low > 100 {
-            return Err(LogicLongError::InvalidLowID(low));
-        }
-
-        let mut logic_long = LogicLong { low, high, tag: String::new() };
+    pub fn new(high: u32, low: u32) -> Result<LogicLong, LogicLongError> {
+        let mut logic_long = LogicLong { high, low, tag: String::new() };
         logic_long.tag = logic_long.to_tag();
         Ok(logic_long)
     }
@@ -56,12 +52,9 @@ impl LogicLong {
             total += position as u64 * Self::BASE.pow(index as u32);
         }
 
-        let (low, high) = (((total % 256) as u32), ((total / 256) as u32));
-        if low > 100 {
-            Err(LogicLongError::InvalidTag(tag))
-        } else {
-            Ok(LogicLong { low, high, tag })
-        }
+        let (high, low) = (((total % 256) as u32), ((total / 256) as u32));
+
+        Ok(LogicLong { high, low, tag })
     }
 
     /// Returns a "proper" tag, i.e. starts with # always and is purely uppercase with no 0s or Os
@@ -75,17 +68,17 @@ impl LogicLong {
 
     pub fn random() -> LogicLong {
         let mut rng = rand::thread_rng();
-        let low = rng.gen_range(0..100);
-        let high = rng.gen::<u32>();
-        // unwrapping here because low is < 100
-        LogicLong::new(low, high).unwrap()
+        let high = rng.gen_range(0..100);
+        let low = rng.gen::<u32>();
+        // unwrapping here because high is < 100
+        LogicLong::new(high, low).unwrap()
     }
 
     pub fn to_tag(&self) -> String {
         let arr: Vec<char> =
             vec!['0', '2', '8', '9', 'P', 'Y', 'L', 'Q', 'G', 'R', 'J', 'C', 'U', 'V'];
         let mut tag = String::new();
-        let mut total = self.low as i64 + self.high as i64 * 0x100;
+        let mut total = self.high as i64 + self.low as i64 * 0x100;
         let mut b14;
 
         while total != 0 {
@@ -105,7 +98,7 @@ impl fmt::Display for LogicLong {
 
 impl fmt::Debug for LogicLong {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "LogicLong {{ low: {}, high: {}, tag: {} }}", self.low, self.high, self.tag)
+        write!(f, "LogicLong {{ high: {}, low: {}, tag: {} }}", self.high, self.low, self.tag)
     }
 }
 
@@ -126,7 +119,7 @@ impl fmt::Display for LogicLongError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             LogicLongError::InvalidTag(tag) => write!(f, "{} is not a valid tag.", tag),
-            LogicLongError::InvalidLowID(low) => write!(f, "Invalid low ID: {}", low),
+            LogicLongError::InvalidHighID(high) => write!(f, "Invalid high ID: {}", high),
         }
     }
 }
