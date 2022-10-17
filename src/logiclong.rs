@@ -5,9 +5,13 @@ use rand::{self, Rng};
 use regex::Regex;
 
 #[derive(Clone, Default, PartialEq, Eq, PartialOrd, Ord)]
-pub struct LogicLong {
-    pub high: u32,
-    pub low: u32,
+pub struct LogicLong<T = u32>
+where
+    T: Copy + ?Sized + From<u32>,
+    u32: From<T>,
+{
+    pub high: T,
+    pub low: T,
     pub tag: String,
 }
 
@@ -22,95 +26,113 @@ lazy_static! {
     pub static ref FIX_REGEX: Regex = Regex::new("[^A-Z0-9]+").unwrap();
 }
 
-impl LogicLong {
-    pub const ORDER: [char; 14] =
-        ['0', '2', '8', '9', 'P', 'Y', 'L', 'Q', 'G', 'R', 'J', 'C', 'U', 'V'];
-    pub(crate) const BASE: u64 = 14;
+const ORDER: [char; 14] = ['0', '2', '8', '9', 'P', 'Y', 'L', 'Q', 'G', 'R', 'J', 'C', 'U', 'V'];
+const BASE: u64 = 14;
 
-    pub fn new(high: u32, low: u32) -> Result<LogicLong, LogicLongError> {
-        let mut logic_long = LogicLong { high, low, tag: String::new() };
+impl<T> LogicLong<T>
+where
+    T: Copy + ?Sized + From<u32>,
+    u32: From<T>,
+{
+    pub fn new(high: T, low: T) -> Self {
+        let mut logic_long = Self { high, low, tag: String::new() };
         logic_long.tag = logic_long.to_tag();
-        Ok(logic_long)
+        logic_long
     }
 
-    pub fn from_tag(tag: String) -> Result<LogicLong, LogicLongError> {
-        LogicLong::parse_tag(tag)
-    }
-
-    pub(crate) fn parse_tag(tag: String) -> Result<LogicLong, LogicLongError> {
-        let tag = LogicLong::fix_tag(tag);
+    pub(crate) fn parse_tag(tag: &str) -> Result<Self, LogicLongError> {
+        let tag = Self::fix_tag(tag);
         let mut total: u64 = 0;
 
         // iterate backwards
         for (index, char) in tag.replace('#', "").chars().rev().enumerate() {
             // get position of char in arr
-            let position = LogicLong::ORDER
+            let position = ORDER
                 .iter()
                 .position(|&x| x == char)
                 .ok_or_else(|| LogicLongError::InvalidTag(tag.clone()))?;
             // total += position times 14 to the power of index
-            total += position as u64 * Self::BASE.pow(index as u32);
+            total += position as u64 * BASE.pow(index as u32);
         }
 
         let (high, low) = (((total % 256) as u32), ((total / 256) as u32));
 
-        Ok(LogicLong { high, low, tag })
+        Ok(Self { high: high.into(), low: low.into(), tag })
     }
 
     /// Returns a "proper" tag, i.e. starts with # always and is purely uppercase with no 0s or Os
-    pub fn is_valid_tag(tag: String) -> bool {
+    #[must_use]
+    pub fn is_valid_tag(tag: &str) -> bool {
         VALID_REGEX.is_match(&tag.to_uppercase().replace('O', "0"))
     }
 
-    pub fn fix_tag(tag: String) -> String {
+    #[must_use]
+    pub fn fix_tag(tag: &str) -> String {
         "#".to_owned() + &FIX_REGEX.replace_all(&tag.to_uppercase(), "").replace('O', "0")
     }
 
-    pub fn random() -> LogicLong {
+    #[must_use]
+    /// Players have a max high of 100, clans/wars/messages seem to be much higher
+    pub fn random(max_high: u32) -> Self {
         let mut rng = rand::thread_rng();
-        let high = rng.gen_range(0..100);
-        let low = rng.gen::<u32>();
-        // unwrapping here because high is < 100
-        LogicLong::new(high, low).unwrap()
+        let high = rng.gen_range(0..max_high).into();
+        let low = rng.gen::<u32>().into();
+
+        Self::new(high, low)
     }
 
     pub fn to_tag(&self) -> String {
-        let arr: Vec<char> =
-            vec!['0', '2', '8', '9', 'P', 'Y', 'L', 'Q', 'G', 'R', 'J', 'C', 'U', 'V'];
         let mut tag = String::new();
-        let mut total = self.high as i64 + self.low as i64 * 0x100;
+        // let mut total: u64 = self.high.into() + self.low.into() * 0x100;
+        let mut total = u64::from(u32::from(self.high)) + u64::from(u32::from(self.low)) * 0x100;
         let mut b14;
 
         while total != 0 {
             b14 = total % 14;
             total /= 14;
-            tag.insert(0, arr[b14 as usize]);
+            tag.insert(0, ORDER[b14 as usize]);
         }
-        LogicLong::fix_tag(tag)
+        Self::fix_tag(&tag)
     }
 }
 
-impl fmt::Display for LogicLong {
+impl<T> fmt::Display for LogicLong<T>
+where
+    T: Copy + ?Sized + From<u32>,
+    u32: From<T>,
+{
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.tag)
     }
 }
 
-impl fmt::Debug for LogicLong {
+impl<T> fmt::Debug for LogicLong<T>
+where
+    T: Copy + ?Sized + From<u32> + fmt::Display,
+    u32: From<T>,
+{
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "LogicLong {{ high: {}, low: {}, tag: {} }}", self.high, self.low, self.tag)
     }
 }
 
-impl FromStr for LogicLong {
+impl<T> FromStr for LogicLong<T>
+where
+    T: Copy + ?Sized + From<u32>,
+    u32: From<T>,
+{
     type Err = LogicLongError;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        LogicLong::parse_tag(s.to_string())
+        Self::parse_tag(s)
     }
 }
 
-impl From<LogicLong> for String {
-    fn from(logic_long: LogicLong) -> String {
+impl<T> From<LogicLong<T>> for String
+where
+    T: Copy + ?Sized + From<u32>,
+    u32: From<T>,
+{
+    fn from(logic_long: LogicLong<T>) -> Self {
         logic_long.tag
     }
 }
@@ -118,8 +140,8 @@ impl From<LogicLong> for String {
 impl fmt::Display for LogicLongError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            LogicLongError::InvalidTag(tag) => write!(f, "{} is not a valid tag.", tag),
-            LogicLongError::InvalidHighID(high) => write!(f, "Invalid high ID: {}", high),
+            Self::InvalidTag(tag) => write!(f, "{tag} is not a valid tag."),
+            Self::InvalidHighID(high) => write!(f, "Invalid high ID: {high}"),
         }
     }
 }
